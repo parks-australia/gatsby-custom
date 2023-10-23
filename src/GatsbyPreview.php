@@ -86,7 +86,7 @@ class GatsbyPreview {
     $preview_url = $settings->get('server_url');
 
     if ($preview_url) {
-      $this->updateData('preview', $preview_url, FALSE, "/__refresh");
+      $this->updateData('preview', $preview_url, FALSE, "/");
     }
 
     $incrementalbuild_url = $settings->get('incrementalbuild_url');
@@ -113,7 +113,7 @@ class GatsbyPreview {
       'action' => 'delete',
     ];
 
-    $preview_path = "/__refresh";
+    $preview_path = "/";
     $settings = $this->configFactory->get('gatsby.settings');
     $preview_url = $settings->get('server_url');
     if ($preview_url) {

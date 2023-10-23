@@ -76,7 +76,7 @@ class GatsbyInstantPreview extends GatsbyPreview {
       $json['secret'] = $settings->get('secret_key');
     }
 
-    $preview_path = "/__refresh";
+    $preview_path = "/";
     if ($settings->get('legacy_preview_url')) {
       // The legacy URL expects an encoded JSON string.
       $encoded_json = json_encode($this->bundleData('preview', '_legacy', $json));
@@ -137,7 +137,7 @@ class GatsbyInstantPreview extends GatsbyPreview {
       $json['secret'] = $settings->get('secret_key');
     }
 
-    $preview_path = "/__refresh";
+    $preview_path = "/";
     if ($settings->get('legacy_preview_url')) {
       // The legacy URL expects an encoded JSON string.
       $json = json_encode($json);

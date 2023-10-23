@@ -112,13 +112,16 @@ function gatsby_endpoints_form_alter(&$form, FormStateInterface $form_state, $fo
 
     // Override node edit form.
     if (!empty($preview_settings[$node_type]) && $preview_url) {
-      $alias = \Drupal::service('path.alias_manager')->getAliasByPath('/node/' . $node->id());
+      $alias = \Drupal::service('path_alias.manager')->getAliasByPath('/node/' . $node->id());
 
       // If this is the front-page we don't want to pass the alias
       // (as Gatsby will likely 404).
       if (\Drupal::service('path.matcher')->isFrontPage()) {
         $alias = '';
       }
+
+      $sites = array("/amp", "/bnp", "/cinp", "/corp", "/knp", "/ninp", "/pknp", "/uktnp");
+      $alias = str_replace($sites, "", $alias);
 
       // Add Gatsby Preview button.
       $form['actions']['gatsby_preview'] = [
@@ -183,8 +186,11 @@ function gatsby_endpoints_node_view(array &$build, $entity, $display, $view_mode
         return;
       }
 
-      $alias = \Drupal::service('path.alias_manager')->getAliasByPath('/node/' . $node->id());
+      $alias = \Drupal::service('path_alias.manager')->getAliasByPath('/node/' . $node->id());
 
+      $sites = array("/amp", "/bnp", "/cinp", "/corp", "/knp", "/ninp", "/pknp", "/uktnp");
+      $alias = str_replace($sites, "", $alias);
+      
       // If this is the front-page we don't want to pass the alias
       // (as Gatsby will likely 404).
       if (\Drupal::service('path.matcher')->isFrontPage()) {

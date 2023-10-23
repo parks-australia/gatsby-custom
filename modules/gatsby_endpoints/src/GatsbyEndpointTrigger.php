@@ -111,7 +111,7 @@ class GatsbyEndpointTrigger {
       }
     }
 
-    $preview_path = "/__refresh";
+    $preview_path = "/";
     $preview_urls = $endpoint->getPreviewUrls();
     if (!empty($preview_urls) && !empty($preview_urls['preview_url'])) {
       foreach ($preview_urls['preview_url'] as $preview_url) {
@@ -163,7 +163,7 @@ class GatsbyEndpointTrigger {
       $json['secret'] = $secret;
     }
 
-    $preview_path = "/__refresh";
+    $preview_path = "/";
     $preview_urls = $endpoint->getPreviewUrls();
     if (!empty($preview_urls) && !empty($preview_urls['preview_url'])) {
       foreach ($preview_urls['preview_url'] as $preview_url) {
