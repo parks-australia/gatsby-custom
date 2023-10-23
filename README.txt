@@ -13,6 +13,9 @@ The Gatsby Endpoints module that ships with `gatsby 1.x` cannot be uninstalled
 without breaking the Drupal website, so we instead point Drupal to this tweaked
 version of the module that is D10 compatible.
 
+---
+# Original Readme from here on
+
 Allows live preview and incremental builds for your Gatsby site built with your
 Drupal content.
 
