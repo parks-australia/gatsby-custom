@@ -41,6 +41,7 @@ class GatsbyEndpointManager {
   public function getEndpoint(string $endpoint_id) {
     $query = $this->entityTypeManager->getStorage('gatsby_endpoint');
     $endpoint_id = $query->getQuery()
+      ->accessCheck(FALSE)
       ->condition('id', $endpoint_id)
       ->execute();
 
@@ -59,6 +60,7 @@ class GatsbyEndpointManager {
   public function getEndpoints() {
     $query = $this->entityTypeManager->getStorage('gatsby_endpoint');
     $endpoint_ids = $query->getQuery()
+      ->accessCheck(FALSE)
       ->sort('weight')
       ->execute();
 

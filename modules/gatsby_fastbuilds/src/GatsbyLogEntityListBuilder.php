@@ -38,6 +38,7 @@ class GatsbyLogEntityListBuilder extends EntityListBuilder {
     $query = $this
       ->getStorage()
       ->getQuery()
+      ->accessCheck(FALSE)
       ->sort('created', 'DESC');
 
     // Only add the pager if a limit is specified.

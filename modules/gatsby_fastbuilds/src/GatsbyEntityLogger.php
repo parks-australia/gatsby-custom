@@ -144,7 +144,7 @@ class GatsbyEntityLogger {
    *   The entity langcode.
    */
   public function deleteLoggedEntity($uuid, $langcode = 'en') {
-    $query = $this->entityTypeManager->getStorage('gatsby_log_entity')->getQuery();
+    $query = $this->entityTypeManager->getStorage('gatsby_log_entity')->getQuery()->accessCheck(FALSE);
     $entity_uuids = $query->condition('entity_uuid', $uuid)->condition('langcode', $langcode)->execute();
     $entities = $this->entityTypeManager->getStorage('gatsby_log_entity')->loadMultiple($entity_uuids);
 
@@ -160,7 +160,7 @@ class GatsbyEntityLogger {
    *   The entity uuid to delete the log entries for.
    */
   public function deleteExpiredLoggedEntities($timestamp) {
-    $query = $this->entityTypeManager->getStorage('gatsby_log_entity')->getQuery();
+    $query = $this->entityTypeManager->getStorage('gatsby_log_entity')->getQuery()->accessCheck(FALSE);
     $entity_uuids = $query->condition('created', $timestamp, '<')->execute();
     $entities = $this->entityTypeManager->getStorage('gatsby_log_entity')
       ->loadMultiple($entity_uuids);
@@ -174,7 +174,7 @@ class GatsbyEntityLogger {
    * Get the oldest created timestampe for a logged entity.
    */
   public function getOldestLoggedEntityTimestamp() {
-    $query = $this->entityTypeManager->getStorage('gatsby_log_entity')->getQuery();
+    $query = $this->entityTypeManager->getStorage('gatsby_log_entity')->getQuery()->accessCheck(FALSE);
     $entity_uuids = $query->sort('created')->range(0, 1)->execute();
     $entities = $this->entityTypeManager->getStorage('gatsby_log_entity')
       ->loadMultiple($entity_uuids);
@@ -197,7 +197,7 @@ class GatsbyEntityLogger {
    *   The JSON data for the entities to sync.
    */
   public function getSync($last_fetch) {
-    $query = $this->entityTypeManager->getStorage('gatsby_log_entity')->getQuery();
+    $query = $this->entityTypeManager->getStorage('gatsby_log_entity')->getQuery()->accessCheck(FALSE);
     $entity_uuids = $query->condition('created', $last_fetch, '>')
       ->sort('created')->execute();
 
