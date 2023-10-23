@@ -1,0 +1,8 @@
+name: 'Gatsby Fast Builds'
+type: module
+description: 'Enables faster Gatsby development builds by only downloading content that has changed'
+core: 8.x
+core_version_requirement: ^8 || ^9 || ^10
+package: 'Gatsby'
+dependencies:
+  - gatsby:gatsby_instantpreview

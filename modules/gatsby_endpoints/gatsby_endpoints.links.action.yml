@@ -1,0 +1,5 @@
+entity.gatsby_endpoint.add_form:
+  route_name: gatsby_endpoints.gatsby_endpoint_plugin_types
+  title: 'Add Gatsby Endpoint'
+  appears_on:
+    - gatsby_endpoints.gatsby_endpoints_collection

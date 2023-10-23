@@ -1,0 +1,6 @@
+services:
+  gatsby_endpoints.commands:
+    class: \Drupal\gatsby_endpoints\Commands\GatsbyEndpointCommands
+    arguments: ['@gatsby.gatsby_endpoint_manager', '@gatsby.gatsby_endpoint_trigger']
+    tags:
+      - { name: drush.command }

@@ -1,0 +1,10 @@
+name: 'Gatsby JSON:API Endpoints (experimental)'
+type: module
+description: 'Create multiple endpoints that can be used to source content into Gatsby sites (under active development and should be considered experimental).'
+core: 8.x
+core_version_requirement: ^8 || ^9 || ^10
+package: 'Gatsby'
+dependencies:
+  - gatsby:gatsby_instantpreview
+  - drupal:jsonapi
+  - jsonapi_extras:jsonapi_extras

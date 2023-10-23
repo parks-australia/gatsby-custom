@@ -1,0 +1,6 @@
+access gatsby endpoints:
+  title: 'Access Gatsby endpoints.'
+
+manage gatsby endpoints:
+  title: 'Create and manage Gatsby endpoints.'
+  restrict access: true

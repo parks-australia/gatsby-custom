@@ -1,0 +1,235 @@
+<?php
+
+/**
+ * @file
+ * Contains gatsby_endpoints.module.
+ */
+
+use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
+use Drupal\gatsby_endpoints\Entity\GatsbyEndpointInterface;
+
+/**
+ * Implements hook_entity_insert().
+ */
+function gatsby_endpoints_entity_insert(EntityInterface $entity) {
+  if (!$entity instanceof ContentEntityInterface) {
+    return;
+  }
+
+  $gatsbyEndpointManager = \Drupal::service('gatsby.gatsby_endpoint_manager');
+  $endpoints = $gatsbyEndpointManager->getEndpoints();
+  foreach ($endpoints as $endpoint) {
+    _gatsby_endpoints_process_entity($endpoint, $entity, 'insert');
+  }
+
+}
+
+/**
+ * Implements hook_entity_update().
+ */
+function gatsby_endpoints_entity_update(EntityInterface $entity) {
+  if (!$entity instanceof ContentEntityInterface) {
+    return;
+  }
+
+  $gatsbyEndpointManager = \Drupal::service('gatsby.gatsby_endpoint_manager');
+  $endpoints = $gatsbyEndpointManager->getEndpoints();
+  foreach ($endpoints as $endpoint) {
+    _gatsby_endpoints_process_entity($endpoint, $entity, 'update');
+  }
+
+}
+
+/**
+ * Implements hook_entity_delete().
+ */
+function gatsby_endpoints_entity_delete(EntityInterface $entity) {
+  if (!$entity instanceof ContentEntityInterface) {
+    return;
+  }
+
+  $gatsbyEndpointManager = \Drupal::service('gatsby.gatsby_endpoint_manager');
+  $endpoints = $gatsbyEndpointManager->getEndpoints();
+  foreach ($endpoints as $endpoint) {
+    _gatsby_endpoints_process_entity($endpoint, $entity, 'delete');
+  }
+
+}
+
+/**
+ * Processes an entity for a specific endpoint.
+ */
+function _gatsby_endpoints_process_entity(GatsbyEndpointInterface $endpoint, ContentEntityInterface $entity, $operation) {
+  // Determine if the endpoint cares about this specific entity.
+  $gatsbyEndpointManager = \Drupal::service('gatsby.gatsby_endpoint_manager');
+  $action = $gatsbyEndpointManager->checkEntity($endpoint, $entity, $operation);
+  if (!$action) {
+    return;
+  }
+
+  $gatsbyEndpointTrigger = \Drupal::service('gatsby.gatsby_endpoint_trigger');
+
+  if ($action == 'delete') {
+    $gatsbyEndpointTrigger->gatsbyPrepareDelete($endpoint, $entity);
+  }
+  else {
+    $gatsbyEndpointTrigger->gatsbyPrepareData($endpoint, $entity);
+  }
+
+  drupal_register_shutdown_function('_gatsby_endpoints_update');
+}
+
+/**
+ * Triggers the update to the Gatsby Preview and Incremental Builds servers.
+ */
+function _gatsby_endpoints_update() {
+  $gatsbyEndpointTrigger = \Drupal::service('gatsby.gatsby_endpoint_trigger');
+  $gatsbyEndpointTrigger->gatsbyUpdate();
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function gatsby_endpoints_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+
+  // Get Preview & iFrame settings.
+  $preview_settings = \Drupal::config('gatsby.settings')->get('preview');
+  $target_settings = \Drupal::config('gatsby.settings')->get('target');
+
+  if (preg_match('/node_(\w*)_edit_form/', $form_id, $matches)) {
+
+    $node_type = $matches[1];
+    $node = \Drupal::routeMatch()->getParameter('node');
+
+    if (empty($node)) {
+      return;
+    }
+
+    $preview_url = \Drupal::service('gatsby.gatsby_endpoint_manager')->getPreviewUrlForEntity($node);
+
+    // Override node edit form.
+    if (!empty($preview_settings[$node_type]) && $preview_url) {
+      $alias = \Drupal::service('path.alias_manager')->getAliasByPath('/node/' . $node->id());
+
+      // If this is the front-page we don't want to pass the alias
+      // (as Gatsby will likely 404).
+      if (\Drupal::service('path.matcher')->isFrontPage()) {
+        $alias = '';
+      }
+
+      // Add Gatsby Preview button.
+      $form['actions']['gatsby_preview'] = [
+        '#type' => 'button',
+        '#weight' => 5,
+      ];
+      $form['actions']['gatsby_preview']['#value'] = 'Open Gatsby Preview';
+      $form['actions']['gatsby_preview']['#attributes']['class'] = ['gatsby-preview'];
+
+      // Implement "Open Preview" action.
+      $form['actions']['gatsby_preview']['#attached'] = [
+        'drupalSettings' => [
+          'gatsby_preview_url' => $preview_url,
+          'gatsby_path' => $alias,
+          'gatsby_preview_target' => !empty($target_settings[$node_type]) ? $target_settings[$node_type] : 'window',
+        ],
+        'library' => [
+          'gatsby/open_preview',
+        ],
+      ];
+    }
+  }
+}
+
+/**
+ * Implements hook_form_ID_alter().
+ */
+function gatsby_endpoints_form_gatsby_admin_form_alter(&$form, FormStateInterface $form_state) {
+  foreach ($form as $key => $form_item) {
+    if (!empty($form_item['#type'])) {
+      unset($form[$key]);
+    }
+  }
+
+  $form['endpoints_message'] = [
+    '#markup' => '<p><strong>' . t('This form is overridden by functionality
+    provided by the Gatsby Endpoints module.') . '</strong></p>',
+  ];
+
+  $url = Url::fromRoute('gatsby_endpoints.gatsby_endpoints_collection');
+  $form['endpoints_link'] = [
+    '#type' => 'link',
+    '#url' => $url,
+    '#title' => t('Manage your Gatsby Endpoints'),
+  ];
+}
+
+/**
+ * Implements hook_node_view().
+ */
+function gatsby_endpoints_node_view(array &$build, $entity, $display, $view_mode) {
+  // Override node view page with iframe to Gatsby site.
+  if (!empty($build['#node']) && $view_mode == 'full') {
+    $node = $build['#node'];
+    $iframe_settings = \Drupal::config('gatsby.settings')->get('iframe');
+
+    // We are wanting to render preview for this content type.
+    if (!empty($iframe_settings[$node->bundle()]) && $iframe_settings[$node->bundle()]) {
+      $preview_url = \Drupal::service('gatsby.gatsby_endpoint_manager')->getPreviewUrlForEntity($node);
+
+      if (!$preview_url) {
+        return;
+      }
+
+      $alias = \Drupal::service('path.alias_manager')->getAliasByPath('/node/' . $node->id());
+
+      // If this is the front-page we don't want to pass the alias
+      // (as Gatsby will likely 404).
+      if (\Drupal::service('path.matcher')->isFrontPage()) {
+        $alias = '';
+      }
+
+      $gatsby_url = preg_replace('/\/$/', '', $preview_url) . $alias;
+
+      $build = [];
+      $build['#node'] = $node;
+
+      // Render an iframe to the preview URL.
+      $build['gatsby_preview'] = [
+        '#type' => 'inline_template',
+        '#template' => '<div class="gatsby-iframe-container"><iframe class="gatsby-iframe" src="{{ url }}" /></div>',
+        '#context' => [
+          'url' => $gatsby_url,
+        ],
+        '#attached' => [
+          'library' => [
+            'gatsby/iframe_preview',
+          ],
+        ],
+      ];
+    }
+  }
+}
+
+/**
+ * Implements hook_cron().
+ */
+function gatsby_endpoints_cron() {
+  $gatsbyEndpointManager = \Drupal::service('gatsby.gatsby_endpoint_manager');
+  $endpoints = $gatsbyEndpointManager->getEndpoints();
+  foreach ($endpoints as $endpoint) {
+    _gatsby_endpoints_trigger_cron_builds($endpoint);
+  }
+}
+
+/**
+ * Triggers Endpoint build if the build_trigger is set to trigger on cron.
+ */
+function _gatsby_endpoints_trigger_cron_builds(GatsbyEndpointInterface $endpoint) {
+  if ($endpoint->getBuildTrigger() === 'cron') {
+    $gatsbyEndpointTrigger = \Drupal::service('gatsby.gatsby_endpoint_trigger');
+    $gatsbyEndpointTrigger->triggerBuildUrls($endpoint);
+  }
+}

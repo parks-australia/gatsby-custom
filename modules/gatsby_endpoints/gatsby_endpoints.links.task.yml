@@ -1,0 +1,12 @@
+gatsby_endpoints.gatsby_endpoint_plugin_types:
+  title: 'Endpoint Types'
+  route_name: gatsby_endpoints.gatsby_endpoint_plugin_types
+  description: 'Manage list of Gatsby endpoint types.'
+  base_route: gatsby.gatsby_admin_form
+  weight: 30
+gatsby_endpoints.gatsby_endpoints_collection:
+  title: 'Endpoints'
+  route_name: gatsby_endpoints.gatsby_endpoints_collection
+  description: 'Manage list of Gatsby endpoints.'
+  base_route: gatsby.gatsby_admin_form
+  weight: 40

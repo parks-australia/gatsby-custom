@@ -1,0 +1,13 @@
+services:
+  plugin.manager.gatsby_endpoint:
+    class: Drupal\gatsby_endpoints\Plugin\GatsbyEndpointManager
+    parent: default_plugin_manager
+  gatsby.gatsby_endpoint_generator:
+    class: Drupal\gatsby_endpoints\GatsbyEndpointGenerator
+    arguments: ['@entity_type.manager', '@entity_field.manager']
+  gatsby.gatsby_endpoint_trigger:
+    class: Drupal\gatsby_endpoints\GatsbyEndpointTrigger
+    arguments: ['@http_client', '@entity_type.manager', '@logger.factory', '@entity.repository', '@gatsby.gatsby_instantpreview']
+  gatsby.gatsby_endpoint_manager:
+    class: Drupal\gatsby_endpoints\GatsbyEndpointManager
+    arguments: ['@entity_type.manager', '@entity_field.manager']

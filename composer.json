@@ -1,0 +1,46 @@
+{
+  "name": "drupal/gatsby-custom",
+  "description": "Enables Live Preview for Gatsby",
+  "type": "drupal-module",
+  "keywords": [
+    "Drupal"
+  ],
+  "license": "GPL-2.0-or-later",
+  "homepage": "https://www.drupal.org/project/gatsby",
+  "minimum-stability": "dev",
+  "support": {
+    "issues": "https://www.drupal.org/project/issues/gatsby",
+    "source": "http://cgit.drupalcode.org/gatsby"
+  },
+  "repositories": [
+    {
+      "type": "package",
+      "package": {
+        "name": "drupal/gatsby-custom",
+        "version": "1.0.0-rc7",
+        "type": "drupal-module",
+        "source": {
+          "url": "https://github.com/parks-australia/gatsby-custom.git",
+          "type": "git",
+          "reference": "refs/heads/8.x-1.0-rc7"
+        }
+      }
+    },
+    {
+      "type": "package",
+      "package": {
+        "name": "drupal/jsonapi_extras",
+        "version": "3.0.0",
+        "type": "drupal-module",
+        "source": {
+          "type": "git",
+          "reference": "refs/heads/8.x-3.x",
+          "url": "https://git.drupalcode.org/project/jsonapi_extras"
+        }
+      }
+    }
+  ],
+  "require": {
+    "drupal/jsonapi_extras": "^3"
+  }
+}

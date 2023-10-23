@@ -1,0 +1,285 @@
+<?php
+
+/**
+ * @file
+ * Contains gatsby.module.
+ */
+
+use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\gatsby\PathMapping;
+
+/**
+ * Implements hook_help().
+ */
+function gatsby_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the gatsby module.
+    case 'help.page.gatsby':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Enables Live Preview for Gatsby') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function gatsby_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+
+  // Get Preview & iFrame settings.
+  $preview_settings = \Drupal::config('gatsby.settings')->get('preview');
+  $target_settings = \Drupal::config('gatsby.settings')->get('target');
+  $iframe_settings = \Drupal::config('gatsby.settings')->get('iframe');
+
+  // Add Gatsby Preview button to content type settings form.
+  if ($form_id == 'node_type_edit_form') {
+    $node_type = \Drupal::routeMatch()->getParameter('node_type')->id();
+
+    $form['gatsby'] = [
+      '#title' => t('Gatsby Preview'),
+      '#type' => 'details',
+      '#group' => 'additional_settings',
+    ];
+
+    $form['gatsby']['gatsby_preview'] = [
+      '#type' => 'checkbox',
+      '#title' => t('Enable Gatsby Preview Button'),
+      '#default_value' => !empty($preview_settings[$node_type]),
+      '#description' => t('This will add a Gatsby Preview button to node pages.'),
+    ];
+
+    $form['gatsby']['gatsby_preview_target'] = [
+      '#type' => 'select',
+      '#title' => t('Gatsby Preview Button Target'),
+      '#options' => [
+        'window' => t('New Window'),
+        'sidebar' => t('Sidebar on Node Edit page'),
+      ],
+      '#description' => t('This controls the behavior of the Gatsby preview button.'),
+      '#default_value' => !empty($target_settings[$node_type]) ? $target_settings[$node_type] : [],
+      '#states' => [
+        'visible' => [
+          ':input[name="gatsby_preview"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
+
+    $form['gatsby']['gatsby_iframe'] = [
+      '#type' => 'checkbox',
+      '#title' => t('Enable Gatsby iFrame Preview'),
+      '#default_value' => !empty($iframe_settings[$node_type]),
+      '#description' => t('This will add an iFrame display to node pages.'),
+    ];
+    $form['actions']['submit']['#submit'][] = 'gatsby_preview_form_submit';
+  }
+  // Override node edit form.
+  elseif (preg_match('/node_(\w*)_edit_form/', $form_id, $matches)) {
+    $moduleHandler = \Drupal::service('module_handler');
+    if ($moduleHandler->moduleExists('gatsby_endpoints')) {
+      return;
+    }
+
+    $node_type = $matches[1];
+    $server_url = \Drupal::config('gatsby.settings')->get('server_url');
+
+    // Override node edit form.
+    if (!empty($preview_settings[$node_type]) && !empty($server_url)) {
+      $front_page = \Drupal::configFactory()->get('system.site')->get('page.front');
+      $node = \Drupal::routeMatch()->getParameter('node');
+
+      // Add Gatsby Preview button.
+      $form['actions']['gatsby_preview'] = [
+        '#type' => 'button',
+        '#weight' => 5,
+      ];
+      $form['actions']['gatsby_preview']['#value'] = 'Open Gatsby Preview';
+      $form['actions']['gatsby_preview']['#attributes']['class'] = ['gatsby-preview'];
+
+      // Implement "Open Preview" action.
+      $form['actions']['gatsby_preview']['#attached'] = [
+        'drupalSettings' => [
+          'gatsby_preview_url' => $server_url,
+          'gatsby_path' => \Drupal::service('gatsby.path_mapping')->getPath($node),
+          'gatsby_preview_target' => !empty($target_settings[$node_type]) ? $target_settings[$node_type] : 'window',
+        ],
+        'library' => [
+          'gatsby/open_preview',
+        ],
+      ];
+    }
+  }
+}
+
+/**
+ * Custom handler for Gatsby preview option.
+ */
+function gatsby_preview_form_submit(array $form, FormStateInterface $form_state) {
+  $config = \Drupal::service('config.factory')->getEditable('gatsby.settings');
+  $id = trim($form_state->getValue('type'));
+  $preview_settings = $config->get('preview');
+  $preview_settings[$id] = $form_state->getValue('gatsby_preview');
+
+  $target_settings = $config->get('target');
+  $target_settings[$id] = $form_state->getValue('gatsby_preview_target');
+
+  $iframe_settings = $config->get('iframe');
+  $iframe_settings[$id] = $form_state->getValue('gatsby_iframe');
+
+  // Save Preview setting.
+  $config
+    ->set('preview', $preview_settings)
+    ->set('iframe', $iframe_settings)
+    ->set('target', $target_settings)
+    ->save();
+}
+
+/**
+ * Implements hook_entity_update().
+ */
+function gatsby_entity_update(EntityInterface $entity) {
+  // Don't run entity_updates if gatsby_endpoints is enabled.
+  $moduleHandler = \Drupal::service('module_handler');
+  if ($moduleHandler->moduleExists('gatsby_endpoints')) {
+    return;
+  }
+
+  $gatsbyPreview = \Drupal::service('gatsby.gatsby_preview');
+  if (!$entity instanceof ContentEntityInterface || !$gatsbyPreview->isPreviewEntity($entity)) {
+    return;
+  }
+
+  if (!$gatsbyPreview->isConfigured()) {
+    return;
+  }
+
+  $gatsbyPreview->gatsbyPrepareData($entity);
+  drupal_register_shutdown_function('_gatsby_update');
+}
+
+/**
+ * Implements hook_entity_insert().
+ */
+function gatsby_entity_insert(EntityInterface $entity) {
+  // Don't run entity_inserts if gatsby_endpoints is enabled.
+  $moduleHandler = \Drupal::service('module_handler');
+  if ($moduleHandler->moduleExists('gatsby_endpoints')) {
+    return;
+  }
+
+  $gatsbyPreview = \Drupal::service('gatsby.gatsby_preview');
+  if (!$entity instanceof ContentEntityInterface || !$gatsbyPreview->isPreviewEntity($entity)) {
+    return;
+  }
+
+  if (!$gatsbyPreview->isConfigured()) {
+    return;
+  }
+
+  $gatsbyPreview->gatsbyPrepareData($entity, 'insert');
+  drupal_register_shutdown_function('_gatsby_update');
+}
+
+/**
+ * Implements hook_entity_delete().
+ */
+function gatsby_entity_delete(EntityInterface $entity) {
+  // Don't run entity_deletes if gatsby_endpoints is enabled.
+  $moduleHandler = \Drupal::service('module_handler');
+  if ($moduleHandler->moduleExists('gatsby_endpoints')) {
+    return;
+  }
+
+  $gatsbyPreview = \Drupal::service('gatsby.gatsby_preview');
+  if (!$entity instanceof ContentEntityInterface || !$gatsbyPreview->isPreviewEntity($entity)) {
+    return;
+  }
+
+  if (!$gatsbyPreview->isConfigured()) {
+    return;
+  }
+
+  $gatsbyPreview->gatsbyPrepareDelete($entity);
+  drupal_register_shutdown_function('_gatsby_update');
+}
+
+/**
+ * Implements hook_node_view().
+ */
+function gatsby_node_view(array &$build, $entity, $display, $view_mode) {
+  // Don't run hook_node_view if gatsby_endpoints is enabled.
+  $moduleHandler = \Drupal::service('module_handler');
+  if ($moduleHandler->moduleExists('gatsby_endpoints')) {
+    return;
+  }
+
+  $server_url = \Drupal::config('gatsby.settings')->get('server_url');
+
+  // Override node view page with iframe to Gatsby site.
+  if (!empty($build['#node']) && $view_mode == 'full') {
+    $node = $build['#node'];
+    $iframe_settings = \Drupal::config('gatsby.settings')->get('iframe');
+
+    // We are wanting to render preview for this content type.
+    if (!empty($iframe_settings[$node->bundle()]) && $iframe_settings[$node->bundle()]) {
+      $gatsby_url = preg_replace('/\/$/', '', $server_url) . \Drupal::service('gatsby.path_mapping')->getPath($node);
+
+      $build = [];
+      $build['#node'] = $node;
+      $build['#entity_type'] = 'node';
+
+      // Render an iframe to the preview URL.
+      $build['gatsby_preview'] = [
+        '#type' => 'inline_template',
+        '#template' => '<div class="gatsby-iframe-container"><iframe class="gatsby-iframe" src="{{ url }}" /></div>',
+        '#context' => [
+          'url' => $gatsby_url,
+        ],
+        '#attached' => [
+          'library' => [
+            'gatsby/iframe_preview',
+          ],
+        ],
+      ];
+    }
+  }
+}
+
+/**
+ * Triggers the update to the Gatsby Preview and Incremental Builds servers.
+ */
+function _gatsby_update() {
+  $gatsbyPreview = \Drupal::service('gatsby.gatsby_preview');
+  $gatsbyPreview->gatsbyUpdate();
+}
+
+/**
+ * Gets the correct path for an entity.
+ *
+ * @deprecated in gatsby:8.x-2.0 and is removed from gatsby:8.x-3.0.
+ *   Use \Drupal\gatsby\PathMapping::getPath().
+ *
+ * @see https://www.drupal.org/node/3203580
+ */
+function _gatsby_get_path(EntityInterface $node) {
+  @trigger_error('_gatsby_get_path() is deprecated in gatsby:8.x-2.0 and is removed from gatsby:8.x-3.0. Use \Drupal\gatsby\PathMapping::getPath(). See https://www.drupal.org/node/3203580', E_USER_DEPRECATED);
+  return \Drupal::service('gatsby.path_mapping')->getPath($node);
+}
+
+/**
+ * Gets an array of Gatsby Preview path mappings.
+ *
+ * @deprecated in gatsby:8.x-2.0 and is removed from gatsby:8.x-3.0.
+ *   Use \Drupal\gatsby\PathMapping::getPathMapping().
+ *
+ * @see https://www.drupal.org/node/3203580
+ */
+function _gatsby_get_path_mapping() {
+  @trigger_error('_gatsby_get_path() is deprecated in gatsby:8.x-2.0 and is removed from gatsby:8.x-3.0. Use \Drupal\gatsby\PathMapping::getPathMapping(). See https://www.drupal.org/node/3203580', E_USER_DEPRECATED);
+  return PathMapping::parsePathMapping(\Drupal::config('gatsby.settings')->get('path_mapping'));
+}

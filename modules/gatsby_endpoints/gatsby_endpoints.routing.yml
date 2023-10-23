@@ -1,0 +1,35 @@
+gatsby_endpoints.gatsby_endpoint_plugin_types:
+  path: '/admin/config/services/gatsby/endpoint/endpoint_types'
+  defaults:
+    _controller: '\Drupal\gatsby_endpoints\Controller\GatsbyEndpointLibraryController::listGatsbyEndpoints'
+    _title: 'Gatsby Endpoint types'
+  requirements:
+    _permission: 'manage gatsby endpoints'
+  options:
+    _admin_route: TRUE
+gatsby_endpoints.admin_add:
+  path: '/admin/config/services/gatsby/endpoint/add/{plugin_id}'
+  defaults:
+    _controller: '\Drupal\gatsby_endpoints\Controller\GatsbyEndpointAddController::gatsbyEndpointAddConfigureForm'
+    theme: null
+    _title: 'Add new Gatsby endpoint'
+  requirements:
+    _permission: 'manage gatsby endpoints'
+gatsby_endpoints.gatsby_endpoints_collection:
+  path: '/admin/config/services/gatsby/endpoint'
+  defaults:
+    _entity_list: 'gatsby_endpoint'
+    _title: 'Gatsby Endpoints'
+  requirements:
+    _permission: 'manage gatsby endpoints'
+  options:
+    _admin_route: TRUE
+gatsby_endpoints.gatsby_endpoints_controller_sync:
+  path: '/gatsby/{endpoint_id}'
+  defaults:
+    _controller: '\Drupal\gatsby_endpoints\Controller\GatsbyEndpointController::sync'
+    _title: 'Gatsby Endpoint'
+  options:
+    _auth: ['basic_auth', 'cookie']
+  requirements:
+    _permission: 'access gatsby endpoints'
