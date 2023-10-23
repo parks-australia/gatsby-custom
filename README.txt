@@ -1,15 +1,17 @@
-> # IMPORTANT
-> 
-> This module is a fork from the [unsupported `1.x` branch of the Drupal Gatsby module](https://git.drupalcode.org/project/gatsby/-/tree/8.x-1.x?ref_type=heads)
-> 
-> We rely on the [Gatsby Endpoints module](https://www.drupal.org/project/gatsby_endpoints), which is a submodule of `gatsby 1.x` but 
-> is removed from `2.x` and now lives in it's own [module project](https://git.drupalcode.org/project/gatsby_endpoints).
-> Work on the `2.x` branch of the module was never finished, and `1.x` is incompatible 
-> with `gatsby 1.x`. 
-> 
-> The Gatsby Endpoints module that ships with `gatsby 1.x` cannot be uninstalled 
-> without breaking the Drupal website, so we instead point Drupal to this tweaked
-> version of the module that is D10 compatible.
+# IMPORTANT
+
+This module is a fork from the unsupported `1.x` branch of the Drupal Gatsby module:
+https://git.drupalcode.org/project/gatsby/-/tree/8.x-1.x?ref_type=heads.
+
+We rely on the Gatsby Endpoints module (https://www.drupal.org/project/gatsby_endpoints), 
+which is a submodule of `gatsby 1.x` but is removed from `2.x` and now lives in 
+it's own module project : https://git.drupalcode.org/project/gatsby_endpoints.
+Work on the `2.x` branch of the module was never finished, and `1.x` is incompatible 
+with `gatsby 1.x`. 
+
+The Gatsby Endpoints module that ships with `gatsby 1.x` cannot be uninstalled 
+without breaking the Drupal website, so we instead point Drupal to this tweaked
+version of the module that is D10 compatible.
 
 Allows live preview and incremental builds for your Gatsby site built with your
 Drupal content.
