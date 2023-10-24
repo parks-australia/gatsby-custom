@@ -78,9 +78,11 @@ class GatsbyEndpointGenerator {
       $param_string .= $url_params['filter'] . '&';
     }
 
-    if (!empty($url_params['include'])) {
-      $param_string .= 'include=' . implode(',', $url_params['include']);
-    }
+    // TESTING
+    // if (!empty($url_params['include'])) {
+    //   $param_string .= 'include=' . implode(',', $url_params['include']);
+    // }
+    // END TESTING
 
     // Add the starting "?" if parameters are needed.
     return $param_string ? '?' . $param_string : $param_string;
