@@ -98,16 +98,15 @@ class GatsbyEndpointForm extends EntityForm {
     $form['build_trigger'] = [
       '#type' => 'select',
       '#options' => [
-        'incremental' => $this->t("Trigger builds incrementally (requires Gatsby Cloud)"),
+        'incremental' => $this->t("Trigger builds when selected build entities change"),
         'cron' => $this->t("Trigger builds on cron runs"),
-        'manual' => $this->t("Trigger builds manually with the built in drush command"),
+        'manual' => $this->t("Trigger builds manually with the built-in drush command"),
       ],
       '#title' => $this->t("Build Trigger"),
       '#default_value' => $entity->getBuildTrigger() ? $entity->getBuildTrigger() : 'incremental',
       '#description' => $this->t('Select how Gatsby build URLs should be
-        triggered. Incremental builds require a
-        <a href="@gatsby-link">Gatsby Cloud Account</a>. This setting has no
-        effect if there are no build URLs entered above.',
+        triggered. 
+        This setting has no effect if there are no build URLs entered above.',
         [
           '@gatsby-link' => 'https://gatsbyjs.com',
         ]
