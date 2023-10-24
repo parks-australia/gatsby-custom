@@ -94,8 +94,16 @@ class GatsbyEndpointTrigger {
       $json['secret'] = $secret;
     }
 
+
+   /**
+    * As we are only relying on the endpoint to provide a plain JSON API
+    * query filtered by Gatsby Endpoint Reference field (Park), and are not 
+    * hosting on Gatsby Cloud (r.i.p), there is no need to assemble and send
+    * all the data needed for Gatsby Cloud Incremental Builds - no other remote 
+    * build service provides this functionality at this point. 
+    */
+
     // Build the entity relationships to send along with the data.
-    // TESTING
     // if (!empty($json['data']['relationships'])) {
     //   // Generate JSON for all related entities to send to Gatsby.
     //   $entity_data = [];
@@ -111,7 +119,6 @@ class GatsbyEndpointTrigger {
     //     $json['data'] = $entity_data;
     //   }
     // }
-    // END TESTING
 
     $preview_path = "/";
     $preview_urls = $endpoint->getPreviewUrls();

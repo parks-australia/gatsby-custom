@@ -75,14 +75,22 @@ class GatsbyEndpointGenerator {
     $param_string = '';
 
     if (!empty($url_params['filter'])) {
-      $param_string .= $url_params['filter'] . '&';
+      $param_string .= $url_params['filter'];
     }
 
-    // TESTING
+    /**
+     * Disable appending the related entity fields to the JSON API request, as 
+     * this feature is only used in true Incremental Builds on Gatsby Cloud - r.i.p :( 
+     */
+    
+    // As no other remote build service supports IBs, this feature is not needed.
+    // In the case of the Place content type in Drupal, the `includes=` string is over 
+    // 14,000 characters long due to complex use of Paragraphs, and cannot be read 
+    // by Gatsby anyway. 
+
     // if (!empty($url_params['include'])) {
     //   $param_string .= 'include=' . implode(',', $url_params['include']);
     // }
-    // END TESTING
 
     // Add the starting "?" if parameters are needed.
     return $param_string ? '?' . $param_string : $param_string;
