@@ -74,6 +74,8 @@ class GatsbyEndpointGenerator {
 
     $param_string = '';
 
+    $url_params['include'] = array_unique($url_params['include']);
+
     if (!empty($url_params['filter'])) {
       $param_string .= $url_params['filter'];
     }
@@ -88,9 +90,14 @@ class GatsbyEndpointGenerator {
     // 14,000 characters long due to complex use of Paragraphs, and cannot be read 
     // by Gatsby anyway. 
 
-    // if (!empty($url_params['include'])) {
-    //   $param_string .= 'include=' . implode(',', $url_params['include']);
-    // }
+    // TODO: This resulting query contains a lot of duplicate items, test if they 
+    // exist before adding more to cull the list to unique items only. 
+    // TODO: This query also contains all levels of the relationship chain, resulting 
+    // in unnecessary includes e.g. field, field.child, all to get field.child.child, etc.
+
+    if (!empty($url_params['include'])) {
+      $param_string .= 'include=' . implode(',', $url_params['include']);
+    }
 
     // Add the starting "?" if parameters are needed.
     return $param_string ? '?' . $param_string : $param_string;
