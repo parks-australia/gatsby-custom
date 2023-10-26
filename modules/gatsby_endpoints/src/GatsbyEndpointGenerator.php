@@ -85,23 +85,17 @@ class GatsbyEndpointGenerator {
     }
 
     /**
-     * Disable appending the related entity fields to the JSON API request, as 
-     * this feature is only used in true Incremental Builds on Gatsby Cloud - r.i.p :( 
+     * Parks Australia updates:
+     * 
+     * The 'include' array contains all levels of the relationship chain, resulting 
+     * in unnecessary includes e.g. parent, parent.child, all to get 
+     * parent.child.grandchild, because requesting parent.child.grandchild also captures
+     * any data from 'parent' and 'parent.child' in the response.
      */
     
-    // As no other remote build service supports IBs, this feature is not needed.
-    // In the case of the Place content type in Drupal, the `includes=` string is over 
-    // 14,000 characters long due to complex use of Paragraphs, and cannot be read 
-    // by Gatsby anyway. 
-
-    // TODO: This query also contains all levels of the relationship chain, resulting 
-    // in unnecessary includes e.g. field, field.child, all to get field.child.child
-    // because requesting 'field.child.child' also captures 'field.child' and 'field' in
-    // the response data.
-
-    // Loop over the 'includes' array. For each item, check the rest of the array items 
-    // and test if the current item appears as a substring of any other values in the array.
-    // If it does, remove it from the array.
+    // Loop over the 'includes' array and scrub any items that are also
+    // substrings of other items. This should leave us with a clean list of 
+    // 'parent.child.grandchild' items
     foreach ($url_params['include'] as $key => $value) {
       foreach ($url_params['include'] as $key2 => $value2) {
         if ($key !== $key2 && strpos($value2, $value) !== FALSE) {
