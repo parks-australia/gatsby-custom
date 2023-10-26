@@ -74,6 +74,10 @@ class GatsbyEndpointGenerator {
 
     $param_string = '';
 
+    // If an entity includes more than one instance of another entity in
+    //  the relationship chain, there may be  a lot of duplicate items. 
+    // Test if they exist before adding more to cull the list to unique
+    // items only. 
     $url_params['include'] = array_unique($url_params['include']);
 
     if (!empty($url_params['filter'])) {
@@ -90,13 +94,24 @@ class GatsbyEndpointGenerator {
     // 14,000 characters long due to complex use of Paragraphs, and cannot be read 
     // by Gatsby anyway. 
 
-    // TODO: This resulting query contains a lot of duplicate items, test if they 
-    // exist before adding more to cull the list to unique items only. 
     // TODO: This query also contains all levels of the relationship chain, resulting 
-    // in unnecessary includes e.g. field, field.child, all to get field.child.child, etc.
+    // in unnecessary includes e.g. field, field.child, all to get field.child.child
+    // because requesting 'field.child.child' also captures 'field.child' and 'field' in
+    // the response data.
+
+    // Loop over the 'includes' array. For each item, check the rest of the array items 
+    // and test if the current item appears as a substring of any other values in the array.
+    // If it does, remove it from the array.
+    foreach ($url_params['include'] as $key => $value) {
+      foreach ($url_params['include'] as $key2 => $value2) {
+        if ($key !== $key2 && strpos($value2, $value) !== FALSE) {
+          unset($url_params['include'][$key]);
+        }
+      }
+    }
 
     if (!empty($url_params['include'])) {
-      $param_string .= 'include=' . implode(',', $url_params['include']);
+      $param_string .= '&include=' . implode(',', $url_params['include']);
     }
 
     // Add the starting "?" if parameters are needed.
