@@ -96,6 +96,9 @@ class GatsbyEndpointTrigger {
 
 
    /**
+    * Parks Australia changes:
+    * tags: gatsby-custom
+    * 
     * As we are only relying on the endpoint to provide a plain JSON API
     * query filtered by Gatsby Endpoint Reference field (Park), and are not 
     * hosting on Gatsby Cloud (r.i.p), there is no need to assemble and send

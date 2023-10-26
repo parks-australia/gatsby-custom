@@ -1,17 +1,33 @@
-# IMPORTANT
+IMPORTANT
 
-This module is a fork from the unsupported `1.x` branch of the Drupal Gatsby module:
+This module is a fork from the unsupported 1.x branch of the Drupal Gatsby module:
 https://git.drupalcode.org/project/gatsby/-/tree/8.x-1.x?ref_type=heads.
 
 We rely on the Gatsby Endpoints module (https://www.drupal.org/project/gatsby_endpoints), 
-which is a submodule of `gatsby 1.x` but is removed from `2.x` and now lives in 
-it's own module project : https://git.drupalcode.org/project/gatsby_endpoints.
-Work on the `2.x` branch of the module was never finished, and `1.x` is incompatible 
-with `gatsby 1.x`. 
+which is a submodule of gatsby 1.x but is removed from 2.x and now lives in 
+its own module project : https://git.drupalcode.org/project/gatsby_endpoints.
+Work on the 2.x branch of the module was never finished, and 1.x is incompatible 
+with gatsby 2.x. 
 
-The Gatsby Endpoints module that ships with `gatsby 1.x` cannot be uninstalled 
-without breaking the Drupal website, so we instead point Drupal to this tweaked
-version of the module that is D10 compatible.
+The Gatsby Endpoints module that ships with gatsby 1.x cannot be uninstalled 
+without breaking the Drupal website :( so we instead point Drupal to this tweaked
+version of the module. While this does mean necromancing a dead module branch 
+(frowned upon in religeous circles), the clock is ticking to complete this project
+so there's no appetite to debug and rewrite everything to work with Gatsby 2.x.
+
+Summary of changes from original module:
+
+1. The 'includes=' section of the /gatsby/some-endpoint is cleaned up, removing 
+    duplicate and unnecessary field requests and making the URLs much shorter.
+
+2. The GatsbyTriggerPreview.php file no longer bothers building the entity
+    relationships to send along with the data, as there's no point sending any 
+    data with our build webhooks - there's no Gatsby Cloud anymore to handle it :(
+    
+Note that the webhooks still contain the JSON data packet of whatever content
+changed, as originally used by Gatsby Cloud's Incremental Builds and Instant Previews
+feature. For non-Gatsby Cloud build services, this data isn't used when the webhook
+is received - it just triggers a full build every time.
 
 ---
 # Original Readme from here on

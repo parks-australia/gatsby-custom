@@ -74,8 +74,17 @@ class GatsbyEndpointGenerator {
 
     $param_string = '';
 
+    /**
+     * Parks Australia updates:
+     * tags: gatsby-custom, includes=, url-length
+     * 
+     * For whatever reason, the includes array contains duplicate entities.
+     * We remove them here to reduce the length of the URL and save the internet
+     * a few KB/volts/grams of cO2.
+     */
+
     // If an entity includes more than one instance of another entity in
-    //  the relationship chain, there may be  a lot of duplicate items. 
+    // the relationship chain, there may be  a lot of duplicate items. 
     // Test if they exist before adding more to cull the list to unique
     // items only. 
     $url_params['include'] = array_unique($url_params['include']);
@@ -86,6 +95,7 @@ class GatsbyEndpointGenerator {
 
     /**
      * Parks Australia updates:
+     * tags: gatsby-custom, includes=, url-length
      * 
      * The 'include' array contains all levels of the relationship chain, resulting 
      * in unnecessary includes e.g. parent, parent.child, all to get 
@@ -95,7 +105,7 @@ class GatsbyEndpointGenerator {
     
     // Loop over the 'includes' array and scrub any items that are also
     // substrings of other items. This should leave us with a clean list of 
-    // 'parent.child.grandchild' items
+    // 'parent.child.grandchild' items that returns the exact same data
     foreach ($url_params['include'] as $key => $value) {
       foreach ($url_params['include'] as $key2 => $value2) {
         if ($key !== $key2 && strpos($value2, $value) !== FALSE) {
