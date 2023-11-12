@@ -107,21 +107,21 @@ class GatsbyEndpointTrigger {
     */
 
     // Build the entity relationships to send along with the data.
-    // if (!empty($json['data']['relationships'])) {
-    //   // Generate JSON for all related entities to send to Gatsby.
-    //   $entity_data = [];
-    //   $included_types = $endpoint->getIncludedEntityTypes($build_type);
-    //   $this->gatsbyInstantPreview->buildRelationshipJson($json['data']['relationships'], $entity_data, $included_types);
+    if (!empty($json['data']['relationships'])) {
+      // Generate JSON for all related entities to send to Gatsby.
+      $entity_data = [];
+      $included_types = $endpoint->getIncludedEntityTypes($build_type);
+      $this->gatsbyInstantPreview->buildRelationshipJson($json['data']['relationships'], $entity_data, $included_types);
 
-    //   if (!empty($entity_data)) {
-    //     // Remove the uuid keys from the array.
-    //     $entity_data = array_values($entity_data);
+      if (!empty($entity_data)) {
+        // Remove the uuid keys from the array.
+        $entity_data = array_values($entity_data);
 
-    //     $original_data = $json['data'];
-    //     $entity_data[] = $original_data;
-    //     $json['data'] = $entity_data;
-    //   }
-    // }
+        $original_data = $json['data'];
+        $entity_data[] = $original_data;
+        $json['data'] = $entity_data;
+      }
+    }
 
     $preview_path = "/";
     $preview_urls = $endpoint->getPreviewUrls();
