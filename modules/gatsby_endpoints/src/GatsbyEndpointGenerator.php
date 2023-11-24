@@ -87,7 +87,9 @@ class GatsbyEndpointGenerator {
     // the relationship chain, there may be  a lot of duplicate items. 
     // Test if they exist before adding more to cull the list to unique
     // items only. 
-    $url_params['include'] = array_unique($url_params['include']);
+    if (!empty($url_params['include'])) {
+      $url_params['include'] = array_unique($url_params['include']);
+    }    
 
     if (!empty($url_params['filter'])) {
       $param_string .= $url_params['filter'];
@@ -106,15 +108,14 @@ class GatsbyEndpointGenerator {
     // Loop over the 'includes' array and scrub any items that are also
     // substrings of other items. This should leave us with a clean list of 
     // 'parent.child.grandchild' items that returns the exact same data
-    foreach ($url_params['include'] as $key => $value) {
-      foreach ($url_params['include'] as $key2 => $value2) {
-        if ($key !== $key2 && strpos($value2, $value) !== FALSE) {
-          unset($url_params['include'][$key]);
+    if (!empty($url_params['include'])) {
+      foreach ($url_params['include'] as $key => $value) {
+        foreach ($url_params['include'] as $key2 => $value2) {
+          if ($key !== $key2 && strpos($value2, $value) !== FALSE) {
+            unset($url_params['include'][$key]);
+          }
         }
       }
-    }
-
-    if (!empty($url_params['include'])) {
       $param_string .= '&include=' . implode(',', $url_params['include']);
     }
 
