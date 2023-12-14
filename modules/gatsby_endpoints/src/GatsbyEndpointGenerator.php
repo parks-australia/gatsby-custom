@@ -89,8 +89,8 @@ class GatsbyEndpointGenerator {
     // items only. 
     if (!empty($url_params['include'])) {
       $url_params['include'] = array_unique($url_params['include']);
-    }    
-
+    }
+ 
     if (!empty($url_params['filter'])) {
       $param_string .= $url_params['filter'];
     }
@@ -99,10 +99,10 @@ class GatsbyEndpointGenerator {
      * Parks Australia updates:
      * tags: gatsby-custom, includes=, url-length
      * 
-     * The 'include' array contains all levels of the relationship chain, resulting 
-     * in unnecessary includes e.g. parent, parent.child, all to get 
-     * parent.child.grandchild, because requesting parent.child.grandchild also captures
-     * any data from 'parent' and 'parent.child' in the response.
+     * The 'include' array contains all levels of the relationship chain, 
+     * resulting in unnecessary includes e.g. parent, parent.child, all to
+     * get parent.child.grandchild, because requesting parent.child.grandchild
+     * also captures any data from 'parent' and 'parent.child' in the response.
      */
     
     // Loop over the 'includes' array and scrub any items that are also
@@ -146,10 +146,23 @@ class GatsbyEndpointGenerator {
         continue;
       }
 
+      // Detect if the Endpoint Reference field is a single or 
+      // multi-value field, and adjust the JSON API filter method to match
+
       $field_type = $field->getType();
       if ($field_type == 'gatsby_endpoint_reference') {
-        $params['filter'] = 'filter[' . $field_name . '.meta.drupal_internal__target_id]=' . $endpoint->id();
+        // Single value field
+        $field_value_count = $field->getSetting('cardinality');
+        
+        if ($field_value_count !== 1) {
+          // Multi-value field, checks if the Endpoint ID exists in an array
+          $params['filter'] = 'filter[park][condition][path]=' . $field_name . '.meta.drupal_internal__target_id&filter[park][condition][operator]=IN&filter[park][condition][value]=' . $endpoint->id();
+          // filter[park][condition][path]=field_site.meta.drupal_internal__target_id&filter[park][condition][operator]=IN&filter[park][condition][value]=uktnp
+        } else {
+          $params['filter'] = 'filter[' . $field_name . '.meta.drupal_internal__target_id]=' . $endpoint->id();
+        }
       }
+      
       elseif (in_array($field_type, $core_reference_fields)) {
 
         // Check if this field references an included entity type.
