@@ -153,16 +153,19 @@ class GatsbyEndpointGenerator {
       if ($field_type == 'gatsby_endpoint_reference') {
         // Single value field
         $field_value_count = $field->getSetting('cardinality');
+
+        var_dump($field_value_count);
         
         if ($field_value_count !== 1) {
           // Multi-value field, checks if the Endpoint ID exists in an array
           $params['filter'] = 'filter[park][condition][path]=' . $field_name . '.meta.drupal_internal__target_id&filter[park][condition][operator]=IN&filter[park][condition][value]=' . $endpoint->id();
+          // filter[park][condition][path]=field_sites.meta.drupal_internal__target_id&filter[park][condition][operator]=IN&filter[park][condition][value]=knp
           // filter[park][condition][path]=field_site.meta.drupal_internal__target_id&filter[park][condition][operator]=IN&filter[park][condition][value]=uktnp
         } else {
           $params['filter'] = 'filter[' . $field_name . '.meta.drupal_internal__target_id]=' . $endpoint->id();
         }
       }
-      
+
       elseif (in_array($field_type, $core_reference_fields)) {
 
         // Check if this field references an included entity type.
