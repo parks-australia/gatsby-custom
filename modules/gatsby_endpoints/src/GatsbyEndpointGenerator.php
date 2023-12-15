@@ -154,7 +154,7 @@ class GatsbyEndpointGenerator {
         // Single value field
         $field_value_count = $field->getSetting('cardinality');
 
-        var_dump($field_value_count);
+        var_dump($field);
         
         if ($field_value_count !== 1) {
           // Multi-value field, checks if the Endpoint ID exists in an array
