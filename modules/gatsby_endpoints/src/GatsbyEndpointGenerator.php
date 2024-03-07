@@ -109,13 +109,13 @@ class GatsbyEndpointGenerator {
     // substrings of other items. This should leave us with a clean list of 
     // 'parent.child.grandchild' items that returns the exact same data
     if (!empty($url_params['include'])) {
-      // foreach ($url_params['include'] as $key => $value) {
-      //   foreach ($url_params['include'] as $key2 => $value2) {
-      //     if ($key !== $key2 && strpos($value2, $value) !== FALSE) {
-      //       unset($url_params['include'][$key]);
-      //     }
-      //   }
-      // }
+      foreach ($url_params['include'] as $key => $value) {
+        foreach ($url_params['include'] as $key2 => $value2) {
+          if ($key !== $key2 && strpos($value2, $value) !== FALSE) {
+            unset($url_params['include'][$key]);
+          }
+        }
+      }
       $param_string .= '&include=' . implode(',', $url_params['include']);
     }
 

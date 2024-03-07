@@ -1,3 +1,21 @@
 # Ignore
 
+# Ignore .env files as they are personal
+#/.env
+/.env.development
+
+# Ignore MacOS Finder files
+.DS_Store
+
+# Ingore Composer installation
+composer.phar
+
+# Ignore backups
+*.sql
+*.tar
+*.gz
+/.idea/
+
+# Ignore dependencies
 /vendor
+/node_modules
