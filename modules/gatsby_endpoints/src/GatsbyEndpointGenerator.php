@@ -104,7 +104,7 @@ class GatsbyEndpointGenerator {
      * get parent.child.grandchild, because requesting parent.child.grandchild
      * also captures any data from 'parent' and 'parent.child' in the response.
      */
-    
+
     // Loop over the 'includes' array and scrub any items that are also
     // substrings of other items. This should leave us with a clean list of 
     // 'parent.child.grandchild' items that returns the exact same data
@@ -113,6 +113,7 @@ class GatsbyEndpointGenerator {
         foreach ($url_params['include'] as $key2 => $value2) {
           if ($key !== $key2 && strpos($value2, $value . '.') === 0) {
             unset($url_params['include'][$key]);
+            break;
           }
         }
       }
