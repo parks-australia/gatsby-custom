@@ -111,9 +111,10 @@ class GatsbyEndpointGenerator {
     if (!empty($url_params['include'])) {
       foreach ($url_params['include'] as $key => $value) {
         foreach ($url_params['include'] as $key2 => $value2) {
-          if ($key !== $key2 && strpos($value2, $value . '.') === 0) {
-            unset($url_params['include'][$key]);
-            break;
+
+          // If the value is a substring of another value, remove it
+          if ($value !== $value2 && strpos($value, $value2 . '.') === 0) {
+            unset($url_params['include'][$key2]);
           }
         }
       }
