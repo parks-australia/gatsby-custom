@@ -30,6 +30,6 @@ gatsby_endpoints.gatsby_endpoints_controller_sync:
     _controller: '\Drupal\gatsby_endpoints\Controller\GatsbyEndpointController::sync'
     _title: 'Gatsby Endpoint'
   options:
-    _auth: ['basic_auth', 'cookie']
+    _auth: ['basic_auth', 'cookie', 'key_auth']
   requirements:
     _permission: 'access gatsby endpoints'
