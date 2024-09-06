@@ -23,11 +23,36 @@ Summary of changes from original module:
 2. The GatsbyTriggerPreview.php file no longer bothers building the entity
     relationships to send along with the data, as there's no point sending any 
     data with our build webhooks - there's no Gatsby Cloud anymore to handle it :(
+
+3. API tokens are now supported for all JSON API requests, meaning users with
+   sufficient permissions can now request unpublished content.
     
 Note that the webhooks still contain the JSON data packet of whatever content
 changed, as originally used by Gatsby Cloud's Incremental Builds and Instant Previews
 feature. For non-Gatsby Cloud build services, this data isn't used when the webhook
 is received - it just triggers a full build every time.
+
+## Making changes
+
+Changes to this module should be made first on the `dev` branch, then commits should
+be merged into `main`. To make the latest version available, tag the `main` branch
+with the next sequential version number, e.g. `2.0.1`. 
+
+## Deploying this module to the Parks Australia Drupal website
+
+To deploy updates from this repo to our Pantheon Drupal website:
+
+1. In the `parksaustralia-cms` repo's `composer.json` file, ensure the 
+   `drupal/gatsby-custom` package version number captures the latest major version
+   e.g. `^2.0` to capture the latest `2.*` versions.
+2. In the `parksaustralia-cms` repo, run `lando composer update --lock-only` to 
+   update to the latest release tag (or whatever command runs `composer` in your local
+   development environment).
+3. Commit and push the changes. The change to `composer.lock` should trigger Pantheon's
+   `dev` environment to run `composer install` to install the latest version. 
+   
+If nothing changes on the `dev` environment, ensure you tagged the `main` branch and 
+not `dev`.
 
 ---
 # Original Readme from here on
