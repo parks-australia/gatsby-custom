@@ -72,12 +72,24 @@ function _gatsby_endpoints_process_entity(GatsbyEndpointInterface $endpoint, Con
 
   $gatsbyEndpointTrigger = \Drupal::service('gatsby.gatsby_endpoint_trigger');
 
-  if ($action == 'delete') {
-    $gatsbyEndpointTrigger->gatsbyPrepareDelete($endpoint, $entity);
-  }
-  else {
-    $gatsbyEndpointTrigger->gatsbyPrepareData($endpoint, $entity);
-  }
+  /**
+   * Parks Australia updates:
+   * tags: gatsby-custom, incremental, builds
+   * 
+   * Disable preparing data to send with the webhook, as without Gatsby Cloud
+   * to process incremental builds, there's no point bundling and sending it. 
+   * This can considerably speed up saving nodes linked to large or complex
+   * groups of entities e.g. Collections
+   */
+  
+  // if ($action == 'delete') {
+  //   $gatsbyEndpointTrigger->gatsbyPrepareDelete($endpoint, $entity);
+  // }
+  // else {
+  //   $gatsbyEndpointTrigger->gatsbyPrepareData($endpoint, $entity);
+  // }
+  
+  $gatsbyEndpointTrigger->triggerBuildUrls($endpoint);
 
   drupal_register_shutdown_function('_gatsby_endpoints_update');
 }
