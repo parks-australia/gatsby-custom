@@ -1,4 +1,4 @@
-IMPORTANT
+# IMPORTANT
 
 This module is a fork from the unsupported 1.x branch of the Drupal Gatsby module:
 https://git.drupalcode.org/project/gatsby/-/tree/8.x-1.x?ref_type=heads.
@@ -15,7 +15,7 @@ version of the module. While this does mean necromancing a dead module branch
 (frowned upon in religeous circles), the clock is ticking to complete this project
 so there's no appetite to debug and rewrite everything to work with Gatsby 2.x.
 
-Summary of changes from original module:
+## Summary of changes from original module:
 
 1. The 'includes=' section of the /gatsby/some-endpoint is cleaned up, removing 
     duplicate and unnecessary field requests and making the URLs much shorter.
@@ -24,7 +24,11 @@ Summary of changes from original module:
     relationships to send along with the data, as there's no point sending any 
     data with our build webhooks - there's no Gatsby Cloud anymore to handle it :(
 
-3. API tokens are now supported for all JSON API requests, meaning users with
+3. `gatsby_endpoints.module` no longer prepared related data to send with the 
+    webhook, as it's not used. This massively speeds up saving pages related to 
+    Collections and prevents 10s timeouts that cause webhook triggers to fail.
+
+4. API tokens are now supported for all JSON API requests, meaning users with
    sufficient permissions can now request unpublished content.
     
 Note that the webhooks still contain the JSON data packet of whatever content
