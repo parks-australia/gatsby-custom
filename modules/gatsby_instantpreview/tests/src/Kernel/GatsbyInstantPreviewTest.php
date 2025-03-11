@@ -4,7 +4,7 @@ namespace Drupal\Tests\gatsby_instantpreview\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\Node;
-use Drupal\Tests\field\Traits\EntityReferenceTestTrait;
+use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 
@@ -19,7 +19,7 @@ class GatsbyInstantPreviewTest extends KernelTestBase {
 
   use ContentTypeCreationTrait;
   use UserCreationTrait;
-  use EntityReferenceTestTrait;
+  use EntityReferenceFieldCreationTrait;
 
   /**
    * {@inheritdoc}

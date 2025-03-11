@@ -12,7 +12,7 @@ use Drupal\Core\Form\FormStateInterface;
  *   id = "gatsby_endpoint_reference",
  *   label = @Translation("Gatsby Endpoint Reference"),
  *   description = @Translation("An entity field containing an entity reference to a Gatsby Endpoint."),
- *   category = @Translation("Reference"),
+ *   category = "reference",
  *   default_widget = "gatsby_endpoints_select",
  *   default_formatter = "entity_reference_label",
  *   list_class = "\Drupal\Core\Field\EntityReferenceFieldItemList",

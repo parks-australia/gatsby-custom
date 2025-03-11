@@ -2,7 +2,7 @@ name: 'Gatsby'
 type: module
 description: 'Improves integration with GatsbyJS including adding Live Preview and Incremental Builds'
 core: 8.x
-core_version_requirement: ^8 || ^9 || ^10
+core_version_requirement: ^8 || ^9 || ^10 || ^11
 package: 'Gatsby'
 configure: gatsby.gatsby_admin_form
 dependencies:
