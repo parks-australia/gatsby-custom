@@ -84,11 +84,13 @@ class GatsbyEndpointGenerator {
      */
 
     // If an entity includes more than one instance of another entity in
-    // the relationship chain, there may be  a lot of duplicate items. 
+    // the relationship chain, there may be a lot of duplicate items. 
     // Test if they exist before adding more to cull the list to unique
     // items only. 
     if (!empty($url_params['include'])) {
-      $url_params['include'] = array_unique($url_params['include']);
+      $filtered = array_unique($url_params['include']);
+      sort($filtered, SORT_STRING);
+      $url_params['include'] = $filtered;
     }
  
     if (!empty($url_params['filter'])) {
