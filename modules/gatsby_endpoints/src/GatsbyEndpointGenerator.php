@@ -189,10 +189,40 @@ class GatsbyEndpointGenerator {
         // Check if this field references an included entity type.
         $handler = $field->getSetting('handler');
         $reference_type = explode(':', $handler);
+
+         /**
+         * Parks Australia updates:
+         * tags: gatsby-custom, includes=, taxonomy_term, handler
+         *
+         * If Drupal assigns a handler other than 'taxonomy_term' to an ER field
+         * referencing a taxonomy vocabulary, change it back so it still matches
+         * the entity stored in $included_types and doesn't get skipped.
+         */
+        
+        if (!empty($reference_type[1]) && $reference_type[1] === 'filter_existing_terms') {
+          $reference_type[1] = 'taxonomy_term';
+        }
+
         if (!empty($reference_type[1]) && in_array($reference_type[1], $include_types)) {
           // Continue building out the JSON:API path to this related field.
           if ($current_field) {
             $field_name = $current_field . '.' . $field_name;
+            
+            /**
+             * Parks Australia updates
+             * 
+             * tags: gatsby-custom, infinite loop, memory leak
+             *
+             * Checks that the first part of the field name is not repeated,
+             * indicating the start of an infinite loop e.g a node containing
+             * an ER field pointing to nodes of the same type, which point to 
+             * more nodes of the same type etc
+             */
+            
+            $parts = explode('.', $field_name);
+            if (count($parts) > 1 && $parts[0] === $parts[1]) {
+              continue;
+            }
           }
           $params['include'][] = $field_name;
 
