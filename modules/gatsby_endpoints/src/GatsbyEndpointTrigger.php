@@ -76,7 +76,7 @@ class GatsbyEndpointTrigger {
    * Drupal entities are update/inserted/deleted in a single request.
    */
   public function gatsbyPrepareData(GatsbyEndpointInterface $endpoint,
-    ContentEntityInterface $entity = NULL,
+    ?ContentEntityInterface $entity = NULL,
     string $action = 'update'
   ) {
 
@@ -161,7 +161,7 @@ class GatsbyEndpointTrigger {
    * Triggers the refreshing of Gatsby preview and incremental builds.
    */
   public function gatsbyPrepareDelete(GatsbyEndpointInterface $endpoint,
-    ContentEntityInterface $entity = NULL
+    ?ContentEntityInterface $entity = NULL
   ) {
 
     $json = [

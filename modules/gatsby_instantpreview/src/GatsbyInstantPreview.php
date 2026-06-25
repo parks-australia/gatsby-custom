@@ -62,7 +62,7 @@ class GatsbyInstantPreview extends GatsbyPreview {
    * being sent to the preview or incremental builds servers if mulutiple
    * Drupal entities are update/inserted/deleted in a single request.
    */
-  public function gatsbyPrepareData(ContentEntityInterface $entity = NULL, string $action = 'update') {
+  public function gatsbyPrepareData(?ContentEntityInterface $entity = NULL, string $action = 'update') {
     $json = $this->getJson($entity);
     if (!$json) {
       return;
@@ -125,7 +125,7 @@ class GatsbyInstantPreview extends GatsbyPreview {
   /**
    * Triggers the refreshing of Gatsby preview and incremental builds.
    */
-  public function gatsbyPrepareDelete(ContentEntityInterface $entity = NULL) {
+  public function gatsbyPrepareDelete(?ContentEntityInterface $entity = NULL) {
     $json = [
       'id' => $entity->uuid(),
       'action' => 'delete',

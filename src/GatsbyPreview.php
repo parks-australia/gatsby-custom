@@ -81,7 +81,7 @@ class GatsbyPreview {
    * being sent to the preview or incremental builds servers if mulutiple
    * Drupal entities are update/created/deleted in a single request.
    */
-  public function gatsbyPrepareData(ContentEntityInterface $entity = NULL) {
+  public function gatsbyPrepareData(?ContentEntityInterface $entity = NULL) {
     $settings = $this->configFactory->get('gatsby.settings');
     $preview_url = $settings->get('server_url');
 
@@ -107,7 +107,7 @@ class GatsbyPreview {
    * This is a separate method to allow overriding services to override the
    * delete method to add additional data.
    */
-  public function gatsbyPrepareDelete(ContentEntityInterface $entity = NULL) {
+  public function gatsbyPrepareDelete(?ContentEntityInterface $entity = NULL) {
     $json = [
       'id' => $entity->uuid(),
       'action' => 'delete',
